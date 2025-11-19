@@ -38,28 +38,26 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="container mx-auto py-4 sm:py-8 px-4 sm:px-6 lg:px-8">
-        {step === "input" && (
-          <CompanyInput onSubmit={handleCompanySubmit} />
-        )}
+    <div className="min-h-screen bg-black">
+      {step === "input" && (
+        <CompanyInput onSubmit={handleCompanySubmit} />
+      )}
 
-        {step === "model-selection" && (
-          <ModelSelector
-            onSubmit={handleModelSubmit}
-            onBack={handleBackToInput}
-            isLoading={isLoading}
-          />
-        )}
+      {step === "model-selection" && (
+        <ModelSelector
+          onSubmit={handleModelSubmit}
+          onBack={handleBackToInput}
+          isLoading={isLoading}
+        />
+      )}
 
-        {step === "results" && companyData && (
-          <VisibilityReport
-            companyData={companyData}
-            selectedModels={selectedModels}
-            onBack={handleBackToModelSelection}
-          />
-        )}
-      </div>
+      {step === "results" && companyData && (
+        <VisibilityReport
+          companyData={companyData}
+          selectedModels={selectedModels}
+          onBack={handleBackToModelSelection}
+        />
+      )}
     </div>
   );
 }
