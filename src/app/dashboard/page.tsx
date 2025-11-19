@@ -4,9 +4,10 @@ import { useState } from "react";
 import { CompanyInput } from "@/components/dashboard/CompanyInput";
 import { ModelSelector } from "@/components/dashboard/ModelSelector";
 import { VisibilityReport } from "@/components/dashboard/VisibilityReport";
+import { LoadingWizard } from "@/components/dashboard/LoadingWizard";
 import type { CompanyData } from "@/lib/types";
 
-type DashboardStep = "input" | "model-selection" | "results";
+type DashboardStep = "input" | "loading-models" | "model-selection" | "loading-report" | "results";
 
 export default function DashboardPage() {
   const [step, setStep] = useState<DashboardStep>("input");
@@ -16,17 +17,24 @@ export default function DashboardPage() {
 
   const handleCompanySubmit = (data: CompanyData) => {
     setCompanyData(data);
+    setIsLoading(true);
+    setStep("loading-models");
+  };
+
+  const handleLoadingComplete = () => {
     setStep("model-selection");
+    setIsLoading(false);
   };
 
   const handleModelSubmit = (models: string[]) => {
     setIsLoading(true);
     setSelectedModels(models);
-    // Small delay to show loading state before transitioning
-    setTimeout(() => {
-      setStep("results");
-      setIsLoading(false);
-    }, 100);
+    setStep("loading-report");
+  };
+
+  const handleReportLoadingComplete = () => {
+    setStep("results");
+    setIsLoading(false);
   };
 
   const handleBackToInput = () => {
@@ -40,7 +48,16 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-black">
       {step === "input" && (
-        <CompanyInput onSubmit={handleCompanySubmit} />
+        <CompanyInput onSubmit={handleCompanySubmit} isLoading={isLoading} />
+      )}
+
+      {step === "loading-models" && (
+        <LoadingWizard 
+          onComplete={handleLoadingComplete} 
+          duration={8000}
+          startStep={0}
+          endStep={0}
+        />
       )}
 
       {step === "model-selection" && (
@@ -48,6 +65,15 @@ export default function DashboardPage() {
           onSubmit={handleModelSubmit}
           onBack={handleBackToInput}
           isLoading={isLoading}
+        />
+      )}
+
+      {step === "loading-report" && (
+        <LoadingWizard 
+          onComplete={handleReportLoadingComplete} 
+          duration={16000}
+          startStep={1}
+          endStep={2}
         />
       )}
 

@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
-import { Download, FileText, Search, CheckCircle2, XCircle, TrendingUp, Lightbulb } from "lucide-react";
+import { Download, FileText, Search, CheckCircle2, XCircle, TrendingUp, Lightbulb, ChevronRight, ChevronDown } from "lucide-react";
 import { generateMockReport, convertToCSV } from "@/lib/mockData";
 import type { CompanyData } from "@/lib/types";
 
@@ -36,6 +36,7 @@ export function VisibilityReport({
   }, [companyData.name, selectedModels]);
 
   const [searchQuery, setSearchQuery] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set());
 
   const handleDownloadCSV = () => {
     if (!report) return;
@@ -57,6 +58,27 @@ export function VisibilityReport({
     // Placeholder for PDF download functionality
     alert("PDF download functionality coming soon!");
   };
+
+  const toggleCategory = (category: string) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
+
+  // Group queries by category
+  const queriesByCategory = report?.queryLog.reduce((acc, query) => {
+    if (!acc[query.category]) {
+      acc[query.category] = [];
+    }
+    acc[query.category].push(query);
+    return acc;
+  }, {} as Record<string, typeof report.queryLog>) || {};
 
   const filteredQueries = report?.queryLog.filter(q => 
     q.query.toLowerCase().includes(searchQuery.toLowerCase())
@@ -89,10 +111,11 @@ export function VisibilityReport({
           <p className="text-gray-400">Here's an overview of your brand's visibility across AI models.</p>
         </div>
 
-        {/* Top Stats Grid - Bento Layout */}
+        {/* Top Stats Grid - Bento Layout matching reference image */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Visibility Score - Large Card */}
-          <Card className="bg-zinc-900 border-zinc-800 sm:col-span-1">
+          {/* Row 1: Visibility Score (spans 1 col) + 3 stat cards */}
+          {/* Visibility Score - Large Card with circular progress */}
+          <Card className="bg-zinc-900 border-zinc-800 row-span-2">
             <CardContent className="p-6 flex flex-col items-center justify-center h-full">
               <p className="text-sm text-gray-400 mb-4">Visibility Score</p>
               <div className="relative w-32 h-32">
@@ -120,7 +143,7 @@ export function VisibilityReport({
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-4xl font-bold text-white">{report.overallScore}%</span>
+                  <span className="text-4xl font-bold text-orange-500">{report.overallScore}%</span>
                 </div>
               </div>
               <p className="text-xs text-gray-500 mt-4 text-center">Your brand's overall visibility in AI responses</p>
@@ -129,34 +152,34 @@ export function VisibilityReport({
 
           {/* Queries Tested */}
           <Card className="bg-zinc-900 border-zinc-800">
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex flex-col justify-center h-full">
               <p className="text-sm text-gray-400 mb-2">Queries Tested</p>
-              <p className="text-4xl font-bold text-white">{report.totalQueries}</p>
+              <p className="text-5xl font-bold text-white">{report.totalQueries}</p>
             </CardContent>
           </Card>
 
           {/* Times Mentioned */}
           <Card className="bg-zinc-900 border-zinc-800">
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex flex-col justify-center h-full">
               <p className="text-sm text-gray-400 mb-2">Times Mentioned</p>
-              <p className="text-4xl font-bold text-white">{report.mentionedIn}</p>
+              <p className="text-5xl font-bold text-white">{report.mentionedIn}</p>
             </CardContent>
           </Card>
 
           {/* AI Models Tested */}
           <Card className="bg-zinc-900 border-zinc-800">
-            <CardContent className="p-6">
+            <CardContent className="p-6 flex flex-col justify-center h-full">
               <p className="text-sm text-gray-400 mb-2">AI Models Tested</p>
-              <p className="text-4xl font-bold text-white">{report.models.length}</p>
+              <p className="text-5xl font-bold text-white">{report.models.length}</p>
             </CardContent>
           </Card>
 
-          {/* Model-specific visibility */}
+          {/* Row 2: Model-specific visibility cards (2 cards spanning remaining columns) */}
           {report.models.map((model, idx) => (
-            <Card key={model} className="bg-zinc-900 border-zinc-800">
-              <CardContent className="p-6">
+            <Card key={model} className="bg-zinc-900 border-zinc-800 lg:col-span-1">
+              <CardContent className="p-6 flex flex-col justify-center h-full">
                 <p className="text-sm text-gray-400 mb-2">{model} Visibility</p>
-                <p className="text-4xl font-bold text-white">
+                <p className="text-5xl font-bold text-white">
                   {Math.round(report.overallScore + (idx === 0 ? 7 : -7))}%
                 </p>
               </CardContent>
@@ -220,60 +243,140 @@ export function VisibilityReport({
           </Card>
         </div>
 
-        {/* Query Log */}
+        {/* Query Log - Collapsible by Category */}
         <Card className="bg-zinc-900 border-zinc-800">
           <CardHeader>
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
               <div>
                 <CardTitle className="text-white">Query Log</CardTitle>
-                <p className="text-sm text-gray-400 mt-1">A detailed log of all queries tested.</p>
-              </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                <div className="relative flex-1 sm:flex-initial">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                  <Input
-                    placeholder="Search queries..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-zinc-800 border-zinc-700 text-white w-full sm:w-64"
-                  />
-                </div>
-                <Button variant="outline" size="sm" className="bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700">
-                  All Models
-                </Button>
+                <p className="text-sm text-gray-400 mt-1">Queries grouped by category - click to expand</p>
               </div>
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2">
-              {/* Table Header */}
-              <div className="grid grid-cols-12 gap-4 text-sm text-gray-400 pb-2 border-b border-zinc-800">
-                <div className="col-span-5">Query</div>
-                <div className="col-span-3">AI Model</div>
-                <div className="col-span-3">Category</div>
-                <div className="col-span-1 text-center">Mentioned</div>
+            {/* Column Headers */}
+            <div className="flex items-center justify-between px-4 py-2 mb-2 text-sm text-gray-400 border-b border-zinc-800">
+              <div className="flex items-center gap-4 flex-1">
+                <div className="w-5"></div> {/* Space for chevron */}
+                <div className="text-left">
+                  <span>Topic</span>
+                </div>
               </div>
               
-              {/* Table Rows */}
-              <div className="space-y-1">
-                {filteredQueries.map((query, idx) => (
-                  <div
-                    key={idx}
-                    className="grid grid-cols-12 gap-4 text-sm py-3 hover:bg-zinc-800/50 rounded-lg px-2 transition-colors"
-                  >
-                    <div className="col-span-5 text-white">{query.query}</div>
-                    <div className="col-span-3 text-gray-300">{query.model}</div>
-                    <div className="col-span-3 text-gray-300">{query.category}</div>
-                    <div className="col-span-1 flex justify-center">
-                      {query.mentioned ? (
-                        <CheckCircle2 className="h-5 w-5 text-green-500" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-red-500" />
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div className="flex items-center gap-6">
+                {/* Visibility Header */}
+                <div className="min-w-[200px] text-center">
+                  <span>Visibility</span>
+                </div>
+                
+                {/* Avg Rank Header */}
+                <div className="min-w-[60px] text-center">
+                  <span>Avg Rank</span>
+                </div>
+                
+                {/* Citations Header */}
+                <div className="min-w-[60px] text-center">
+                  <span>Citations</span>
+                </div>
               </div>
+            </div>
+
+            <div className="space-y-1">
+              {Object.entries(queriesByCategory).map(([category, queries]) => {
+                const isExpanded = expandedCategories.has(category);
+                const categoryQueries = queries.filter(q => 
+                  searchQuery === "" || q.query.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+                
+                if (categoryQueries.length === 0) return null;
+
+                const mentionedCount = categoryQueries.filter(q => q.mentioned).length;
+                const visibilityPercent = Math.round((mentionedCount / categoryQueries.length) * 100);
+                
+                return (
+                  <div key={category} className="border border-zinc-800 rounded-lg overflow-hidden">
+                    {/* Category Header - Clickable */}
+                    <button
+                      onClick={() => toggleCategory(category)}
+                      className="w-full flex items-center justify-between p-4 hover:bg-zinc-800/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4 flex-1">
+                        {isExpanded ? (
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <ChevronRight className="h-5 w-5 text-gray-400" />
+                        )}
+                        <div className="text-left">
+                          <h3 className="text-white font-medium">{category}</h3>
+                          <p className="text-sm text-gray-400">{categoryQueries.length} prompts</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-6">
+                        {/* Visibility Bar */}
+                        <div className="flex items-center gap-3 min-w-[200px]">
+                          <div className="flex-1 bg-zinc-800 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full transition-all ${
+                                visibilityPercent >= 70 ? "bg-orange-500" :
+                                visibilityPercent >= 50 ? "bg-green-500" :
+                                visibilityPercent >= 20 ? "bg-yellow-500" :
+                                "bg-red-500"
+                              }`}
+                              style={{ width: `${visibilityPercent}%` }}
+                            />
+                          </div>
+                          <span className="text-white font-semibold min-w-[45px]">{visibilityPercent}%</span>
+                        </div>
+                        
+                        {/* Avg Rank */}
+                        <div className="text-gray-400 min-w-[60px] text-center">
+                          <span className="text-sm">#{Math.floor(Math.random() * 5) + 3}.{Math.floor(Math.random() * 9) + 1}</span>
+                        </div>
+                        
+                        {/* Citations */}
+                        <div className="text-gray-400 min-w-[60px] text-center">
+                          <span className="text-sm">{mentionedCount}</span>
+                        </div>
+                      </div>
+                    </button>
+                    
+                    {/* Expanded Content with Table */}
+                    {isExpanded && (
+                      <div className="border-t border-zinc-800 bg-black/30">
+                        {/* Table Headers inside expanded section */}
+                        <div className="grid grid-cols-12 gap-4 px-6 py-3 text-xs text-gray-400 border-b border-zinc-800">
+                          <div className="col-span-5">Query</div>
+                          <div className="col-span-3">AI Model</div>
+                          <div className="col-span-3">Category</div>
+                          <div className="col-span-1 text-center">Mentioned</div>
+                        </div>
+                        
+                        {/* Table Rows */}
+                        <div className="px-6 py-2">
+                          {categoryQueries.map((query, idx) => (
+                            <div
+                              key={idx}
+                              className="grid grid-cols-12 gap-4 py-3 hover:bg-zinc-800/30 rounded-lg px-2 transition-colors text-sm"
+                            >
+                              <div className="col-span-5 text-white">{query.query}</div>
+                              <div className="col-span-3 text-gray-300">{query.model}</div>
+                              <div className="col-span-3 text-gray-400">{query.category}</div>
+                              <div className="col-span-1 flex justify-center">
+                                {query.mentioned ? (
+                                  <CheckCircle2 className="h-5 w-5 text-green-500" />
+                                ) : (
+                                  <XCircle className="h-5 w-5 text-red-500" />
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>
