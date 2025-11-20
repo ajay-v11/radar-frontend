@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Highlight } from "@/components/ui/hero-highlight";
+import { BackgroundBeams } from "@/components/ui/background-beams";
 
 export default function Home() {
   const [showRadar, setShowRadar] = useState(false);
@@ -27,19 +28,20 @@ export default function Home() {
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0a0f0d] px-4">
+      <BackgroundBeams />
       <div
-        className={`absolute left-1/2 -translate-x-1/2 transition-all duration-1000 ease-out ${
+        className={`absolute left-1/2 z-10 -translate-x-1/2 transition-all duration-1000 ease-out ${
           moveToTop
             ? "top-8 sm:top-12 md:top-16 lg:top-20"
-            : "top-1/2 -translate-y-1/2"
+            : "top-[35%] sm:top-[40%] -translate-y-1/2"
         }`}
       >
-        <h1 className="font-akira flex text-[3rem] font-black tracking-wider text-[#f59e0b] sm:text-[4rem] md:text-[6rem] lg:text-[8rem] xl:text-[10rem] 2xl:text-[12rem]">
+        <h1 className="font-akira flex text-[3.5rem] font-black tracking-wider text-[#f59e0b] sm:text-[4.5rem] md:text-[6rem] lg:text-[8rem] xl:text-[10rem] 2xl:text-[12rem]">
           <span className="inline-block">R</span>
           <span
             className={`inline-block overflow-hidden transition-all duration-1000 ${
               showRadar
-                ? "max-w-[200px] sm:max-w-[300px] md:max-w-[500px] lg:max-w-[700px] xl:max-w-[900px] opacity-100"
+                ? "max-w-[240px] sm:max-w-[320px] md:max-w-[500px] lg:max-w-[700px] xl:max-w-[900px] opacity-100"
                 : "max-w-0 opacity-0"
             }`}
           >
@@ -49,13 +51,13 @@ export default function Home() {
       </div>
 
       <div
-        className={`flex min-h-screen flex-col items-center justify-center px-4 pt-32 sm:pt-36 md:pt-40 lg:pt-48 ${
+        className={`relative z-10 flex min-h-screen flex-col items-center justify-center px-4 pt-20 sm:pt-28 md:pt-36 lg:pt-44 ${
           showTyping ? "" : "opacity-0"
         }`}
       >
-        <div className="mb-8 text-center sm:mb-10 md:mb-12">
+        <div className="mb-6 text-center sm:mb-8 md:mb-10 lg:mb-12">
           {showTyping && (
-            <h2 className="text-xl font-light text-white sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl">
+            <h2 className="font-poppins text-base font-light leading-relaxed text-white sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
               {!typingComplete ? (
                 <span className="typing-full-text inline-block">
                   Don't guess your visibility. Radar it
@@ -73,7 +75,7 @@ export default function Home() {
         </div>
 
         <button
-          className={`rounded-full bg-[#f59e0b] px-6 py-3 text-base font-medium text-[#0a0f0d] transition-all hover:scale-105 hover:bg-[#d97706] sm:px-8 sm:py-4 sm:text-lg ${
+          className={`font-poppins rounded-full bg-[#f59e0b] px-5 py-2.5 text-sm font-medium text-[#0a0f0d] transition-all hover:scale-105 hover:bg-[#d97706] sm:px-7 sm:py-3.5 sm:text-base md:px-8 md:py-4 md:text-lg ${
             showButton
               ? "translate-y-0 opacity-100"
               : "translate-y-10 opacity-0"
