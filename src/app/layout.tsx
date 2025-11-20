@@ -1,11 +1,17 @@
 import type { Metadata } from "next";
-import { Urbanist } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 
-const urbanist = Urbanist({
-  variable: "--font-urbanist",
-  subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+const akira = localFont({
+  src: "../asserts/fonts/Akira.otf",
+  variable: "--font-akira",
+  weight: "700",
+});
+
+const poppins = localFont({
+  src: "../asserts/fonts/Poppins-Regular.ttf",
+  variable: "--font-poppins",
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -20,9 +26,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${urbanist.variable} font-sans antialiased`}
-      >
+      <body className={`${akira.variable} ${poppins.variable} antialiased`}>
         {children}
       </body>
     </html>

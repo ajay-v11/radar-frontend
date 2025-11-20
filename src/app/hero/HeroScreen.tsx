@@ -1,12 +1,12 @@
 import React from 'react'
-import { Hero } from '@/components/landing/Hero'
-import { Features } from '@/components/landing/Features'
+import Hero from '@/components/landing/Hero'
+import Features from '@/components/landing/Features'
 
 function HeroScreen() {
   return (
     <main>
-      <Hero />
-      <Features />
+      <Hero/>
+      <Features/>
     </main>
   )
 }

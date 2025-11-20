@@ -1,63 +1,60 @@
-import { Search, BarChart3, Users, FileText, LucideIcon } from "lucide-react";
-import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+"use client";
 
-interface Feature {
-  icon: LucideIcon;
-  title: string;
-  description: string;
-}
+import { Search, BarChart3, Users, FileText } from "lucide-react";
 
-const features: Feature[] = [
+const features = [
   {
     icon: Search,
     title: "Industry Detection",
-    description: "Automatically identifies relevant queries for your industry"
+    description: "Automatically identifies relevant queries for your industry",
   },
   {
     icon: BarChart3,
     title: "Multi-Model Testing",
-    description: "Compare visibility across ChatGPT, Claude, Perplexity, and Gemini"
+    description: "Compare visibility across ChatGPT, Claude, Perplexity, and Gemini",
   },
   {
     icon: Users,
     title: "Competitor Analysis",
-    description: "See how you rank against competitors in AI responses"
+    description: "See how you rank against competitors in AI responses",
   },
   {
     icon: FileText,
     title: "Complete Query Transparency",
-    description: "View every query tested with detailed results"
-  }
+    description: "View every query tested with detailed results",
+  },
 ];
 
-export function Features() {
+export default function Features() {
   return (
-    <section className="bg-white px-4 py-16 md:py-24" aria-label="Features section">
+    <section className="min-h-screen bg-gradient-to-b from-[#0a0f0d] to-[#1a1f1d] px-4 py-20">
       <div className="mx-auto max-w-7xl">
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold text-gray-900 md:text-4xl">
+        <div className="mb-16 text-center">
+          <h2 className="font-poppins mb-4 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
             Everything You Need to Track AI Visibility
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="font-poppins text-base text-gray-400 sm:text-lg md:text-xl">
             Comprehensive insights into how AI models perceive your brand
           </p>
         </div>
-        
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4" role="list">
-          {features.map((feature) => {
-            const Icon = feature.icon;
-            return (
-              <Card key={feature.title} className="transition-shadow hover:shadow-md" role="listitem">
-                <CardHeader>
-                  <div className="mb-4 inline-flex rounded-lg bg-blue-100 p-3" aria-hidden="true">
-                    <Icon className="h-6 w-6 text-blue-600" aria-label={`${feature.title} icon`} />
-                  </div>
-                  <CardTitle className="mb-2">{feature.title}</CardTitle>
-                  <CardDescription>{feature.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            );
-          })}
+
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {features.map((feature, index) => (
+            <div
+              key={index}
+              className="group rounded-2xl bg-white/5 p-6 backdrop-blur-sm transition-all duration-300 hover:bg-white/10"
+            >
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl bg-blue-500/10">
+                <feature.icon className="h-7 w-7 text-blue-400" />
+              </div>
+              <h3 className="font-poppins mb-3 text-lg font-semibold text-white">
+                {feature.title}
+              </h3>
+              <p className="font-poppins text-sm leading-relaxed text-gray-400">
+                {feature.description}
+              </p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
