@@ -1,10 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Highlight } from "@/components/ui/hero-highlight";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 
 export default function Hero() {
+  const router = useRouter();
   const [showRadar, setShowRadar] = useState(false);
   const [moveToTop, setMoveToTop] = useState(false);
   const [showTyping, setShowTyping] = useState(false);
@@ -75,6 +77,7 @@ export default function Hero() {
         </div>
 
         <button
+          onClick={() => router.push("/dashboard")}
           className={`font-poppins rounded-full bg-[#f59e0b] px-5 py-2.5 text-sm font-medium text-[#0a0f0d] transition-all hover:scale-105 hover:bg-[#d97706] sm:px-7 sm:py-3.5 sm:text-base md:px-8 md:py-4 md:text-lg ${
             showButton
               ? "translate-y-0 opacity-100"
