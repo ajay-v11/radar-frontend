@@ -1,11 +1,8 @@
-import { Hero } from "@/components/landing/Hero";
-import { Features } from "@/components/landing/Features";
+import React from "react";
+import HeroScreen from "./hero/HeroScreen";
 
 export default function Home() {
   return (
-    <main>
-      <Hero />
-      <Features />
-    </main>
+    <HeroScreen/>
   );
 }
