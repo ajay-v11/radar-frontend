@@ -115,14 +115,16 @@ export const Highlight = ({
     <motion.span
       initial={{
         backgroundSize: "0% 100%",
+        opacity: 0.8,
       }}
       animate={{
         backgroundSize: "100% 100%",
+        opacity: 1,
       }}
       transition={{
-        duration: 2,
-        ease: "linear",
-        delay: 0.5,
+        duration: 1.2,
+        ease: [0.4, 0.0, 0.2, 1], // Custom cubic-bezier for smooth easing
+        delay: 0.2,
       }}
       style={{
         backgroundRepeat: "no-repeat",
@@ -130,7 +132,7 @@ export const Highlight = ({
         display: "inline",
       }}
       className={cn(
-        `relative inline-block rounded-lg bg-gradient-to-r from-indigo-300 to-purple-300 px-1 pb-1 dark:from-indigo-500 dark:to-purple-500`,
+        `relative inline-block rounded-md px-3 py-1`,
         className,
       )}
     >

@@ -46,7 +46,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-background">
       {step === "input" && (
         <CompanyInput onSubmit={handleCompanySubmit} isLoading={isLoading} />
       )}

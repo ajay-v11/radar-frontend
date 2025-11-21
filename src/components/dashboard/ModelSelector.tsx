@@ -6,6 +6,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Loader2 } from "lucide-react"
+import { GlowingStarsBackground } from "@/components/ui/glowing-stars"
 
 interface ModelSelectorProps {
   onSubmit: (models: string[]) => void
@@ -66,13 +67,15 @@ export function ModelSelector({ onSubmit, onBack, isLoading = false }: ModelSele
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-black">
-      <Card className="w-full max-w-md bg-zinc-900 border-zinc-800">
+    <div className="relative min-h-screen flex items-center justify-center p-4 bg-background overflow-hidden">
+      <GlowingStarsBackground />
+      
+      <Card className="relative z-10 w-full max-w-md bg-card border-border">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-2xl font-semibold text-white">
+          <CardTitle className="text-2xl font-semibold text-foreground">
             Select AI Models
           </CardTitle>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-muted-foreground">
             Choose exactly 2 AI models to compare your brand visibility
           </p>
         </CardHeader>
@@ -88,10 +91,10 @@ export function ModelSelector({ onSubmit, onBack, isLoading = false }: ModelSele
                     key={model.id}
                     className={`flex items-start space-x-3 p-4 rounded-lg border transition-colors ${
                       isChecked
-                        ? "border-orange-500 bg-orange-500/10"
+                        ? "border-primary bg-primary/10"
                         : isDisabled
-                        ? "border-zinc-700 bg-zinc-800/50 opacity-50"
-                        : "border-zinc-700 bg-zinc-800/50 hover:border-zinc-600"
+                        ? "border-border bg-muted/50 opacity-50"
+                        : "border-border bg-muted/50 hover:border-primary/50"
                     }`}
                   >
                     <Checkbox
@@ -104,13 +107,13 @@ export function ModelSelector({ onSubmit, onBack, isLoading = false }: ModelSele
                     <div className="flex-1 min-w-0">
                       <Label
                         htmlFor={model.id}
-                        className={`text-base font-medium cursor-pointer block text-white ${
+                        className={`text-base font-medium cursor-pointer block text-foreground ${
                           isDisabled ? "cursor-not-allowed" : ""
                         }`}
                       >
                         {model.name}
                       </Label>
-                      <p className="text-sm text-gray-400 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {model.description}
                       </p>
                     </div>
@@ -120,7 +123,7 @@ export function ModelSelector({ onSubmit, onBack, isLoading = false }: ModelSele
             </div>
 
             {selected.length !== 2 && (
-              <div className="text-sm text-gray-400 bg-zinc-800/50 p-3 rounded-md border border-zinc-700">
+              <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-md border border-border">
                 {selected.length === 0
                   ? "Please select 2 AI models to continue"
                   : selected.length === 1
@@ -136,7 +139,7 @@ export function ModelSelector({ onSubmit, onBack, isLoading = false }: ModelSele
                 size="lg"
                 onClick={onBack}
                 disabled={isLoading}
-                className="flex-1 bg-zinc-800 border-zinc-700 text-white hover:bg-zinc-700"
+                className="flex-1"
               >
                 Back
               </Button>
@@ -144,7 +147,7 @@ export function ModelSelector({ onSubmit, onBack, isLoading = false }: ModelSele
                 type="submit"
                 size="lg"
                 disabled={!isValid || isLoading}
-                className="flex-1 bg-orange-500 hover:bg-orange-600 text-black font-semibold"
+                className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold"
               >
                 {isLoading ? (
                   <>
