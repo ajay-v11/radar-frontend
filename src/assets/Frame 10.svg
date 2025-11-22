@@ -1,0 +1,30 @@
+<svg width="120" height="124" viewBox="0 0 120 124" fill="none" xmlns="http://www.w3.org/2000/svg">
+<mask id="mask0_38_4" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="-56" y="-78" width="178" height="280">
+<rect width="4" height="280" transform="translate(-2 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(4 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(10 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(16 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(22 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(28 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(34 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(40 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(46 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(52 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(58 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(64 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(70 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(76 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(82 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(88 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(94 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(100 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(106 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(112 -78)" fill="#FFA500"/>
+<rect width="4" height="280" transform="translate(118 -78)" fill="#FFA500"/>
+</mask>
+<g mask="url(#mask0_38_4)">
+<ellipse cx="23.1148" cy="61.7213" rx="23.1148" ry="61.7213" fill="#FFA500"/>
+<ellipse cx="60" cy="61.7213" rx="23.1148" ry="61.7213" fill="#FFA500"/>
+<ellipse cx="96.8853" cy="61.7213" rx="23.1148" ry="61.7213" fill="#FFA500"/>
+</g>
+</svg>
