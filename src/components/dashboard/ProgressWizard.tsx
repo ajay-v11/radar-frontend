@@ -1,65 +1,128 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import {Check, Loader2} from 'lucide-react';
 
-interface WizardStep {
-  label: string
-  status: "pending" | "active" | "completed"
+interface CategoryProgress {
+  name: string;
+  status: 'pending' | 'loading' | 'complete';
 }
 
 interface ProgressWizardProps {
-  steps: WizardStep[]
-  message?: string
-  className?: string
+  currentStep: number;
+  phase: 1 | 2;
+  categories?: CategoryProgress[];
 }
 
-export function ProgressWizard({ steps, message, className }: ProgressWizardProps) {
+const PHASE_2_STEPS = [
+  'Detecting Industry',
+  'Generating Queries',
+  'Testing AI Models',
+];
+
+export function ProgressWizard({
+  currentStep,
+  phase,
+  categories = [],
+}: ProgressWizardProps) {
+  const STEPS = PHASE_2_STEPS;
+
   return (
-    <div className={cn("space-y-8", className)}>
-      {/* Steps */}
-      <div className="relative space-y-6">
-        {/* Connecting Line */}
-        <div className="absolute left-[15px] top-4 bottom-4 w-[2px] bg-zinc-800" />
-        
-        {steps.map((step, index) => (
-          <div key={index} className="relative flex items-center gap-4">
-            {/* Step Indicator */}
-            <div className="relative z-10">
-              <div
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center transition-all duration-500",
-                  step.status === "completed" && "bg-orange-500",
-                  step.status === "active" && "bg-orange-500 animate-pulse",
-                  step.status === "pending" && "bg-zinc-700"
-                )}
-              >
-                {step.status === "active" && (
-                  <div className="absolute inset-0 rounded-full bg-orange-500 animate-ping opacity-75" />
-                )}
-                <div className="w-3 h-3 rounded-full bg-black" />
-              </div>
-            </div>
-            
-            {/* Step Label */}
-            <span
-              className={cn(
-                "text-lg transition-colors duration-300",
-                step.status === "active" && "text-white font-semibold",
-                step.status === "completed" && "text-gray-400",
-                step.status === "pending" && "text-gray-600"
-              )}
-            >
-              {step.label}
-            </span>
+    <div className='w-64 border-r border-border bg-card p-6'>
+      <div className='space-y-6'>
+        <div>
+          <h3 className='text-sm font-semibold text-foreground mb-4'>
+            Progress
+          </h3>
+
+          {/* Vertical Progress Steps */}
+          <div className='space-y-4'>
+            {STEPS.map((step, idx) => {
+              const isComplete = idx < currentStep;
+              const isCurrent = idx === currentStep;
+              const isPending = idx > currentStep;
+
+              return (
+                <div key={idx} className='flex items-start gap-3'>
+                  {/* Step Indicator */}
+                  <div className='relative shrink-0'>
+                    <div
+                      className={`w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all ${
+                        isComplete
+                          ? 'bg-primary border-primary'
+                          : isCurrent
+                          ? 'bg-primary/20 border-primary'
+                          : 'bg-background border-border'
+                      }`}>
+                      {isComplete ? (
+                        <Check className='h-4 w-4 text-primary-foreground' />
+                      ) : isCurrent ? (
+                        <Loader2 className='h-4 w-4 text-primary animate-spin' />
+                      ) : (
+                        <span className='text-xs text-muted-foreground'>
+                          {idx + 1}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Connecting Line */}
+                    {idx < STEPS.length - 1 && (
+                      <div
+                        className={`absolute left-4 top-8 w-0.5 h-8 -ml-px transition-all ${
+                          isComplete ? 'bg-primary' : 'bg-border'
+                        }`}
+                      />
+                    )}
+                  </div>
+
+                  {/* Step Label */}
+                  <div className='flex-1 pt-1'>
+                    <p
+                      className={`text-sm font-medium ${
+                        isComplete || isCurrent
+                          ? 'text-foreground'
+                          : 'text-muted-foreground'
+                      }`}>
+                      {step}
+                    </p>
+                    {isCurrent && (
+                      <p className='text-xs text-muted-foreground mt-1'>
+                        In progress...
+                      </p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        ))}
+        </div>
+
+        {/* Category Progress */}
+        {categories.length > 0 && currentStep >= 2 && (
+          <div className='pt-4 border-t border-border'>
+            <h4 className='text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3'>
+              Categories
+            </h4>
+            <div className='space-y-2'>
+              {categories.map((cat, idx) => (
+                <div key={idx} className='flex items-center gap-2'>
+                  <div
+                    className={`h-2 w-2 rounded-full ${
+                      cat.status === 'complete'
+                        ? 'bg-green-500'
+                        : cat.status === 'loading'
+                        ? 'bg-primary animate-pulse'
+                        : 'bg-muted'
+                    }`}
+                  />
+                  <span className='text-xs text-muted-foreground truncate'>
+                    {cat.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-      
-      {/* Message */}
-      {message && (
-        <p className="text-gray-400 text-sm animate-pulse">{message}</p>
-      )}
     </div>
-  )
+  );
 }

@@ -71,43 +71,67 @@ export function CompanyInput({
 
     // Only submit if valid
     if (Object.keys(newErrors).length === 0) {
+      const trimmedUrl = website.trim();
+      const trimmedName = companyName.trim();
+
+      console.log(
+        '[CompanyInput] Submitting - Name:',
+        trimmedName,
+        'URL:',
+        trimmedUrl
+      );
+
       try {
         const apiClient = getAPIClient();
 
-        // Call API with progress callback
+        // Call API with progress callback - pass values as-is
         const analysisData = await apiClient.analyzeCompany(
           {
-            company_url: website.trim(),
-            company_name: companyName.trim(),
+            company_url: trimmedUrl,
+            company_name: trimmedName,
           },
           onProgress
         );
 
+        console.log('[CompanyInput] Analysis completed:', analysisData);
+
         // Pass both company data and analysis data to parent
         onSubmit(
           {
-            name: companyName.trim(),
-            website: website.trim(),
+            name: trimmedName,
+            website: trimmedUrl,
           },
           analysisData
         );
       } catch (error) {
+        console.error('[CompanyInput] Error during analysis:', error);
+
         // Format and log the error
         const formattedError = formatErrorMessage(error);
         logError(formattedError, {
           component: 'CompanyInput',
           action: 'analyzeCompany',
-          companyUrl: website.trim(),
+          companyUrl: trimmedUrl,
         });
+
+        // Add helpful message for connection errors
+        let errorMessage = formattedError.userMessage;
+        if (
+          errorMessage.includes('SSE connection') ||
+          errorMessage.includes('Unable to connect')
+        ) {
+          errorMessage +=
+            ' Make sure the backend API is running on http://localhost:8000 or switch to Mock mode for testing.';
+        }
 
         // If onError callback provided, use it (for full-page error display)
         if (onError) {
-          onError(formattedError);
+          onError({...formattedError, userMessage: errorMessage});
         } else {
           // Otherwise, show inline error
           setErrors((prev) => ({
             ...prev,
-            api: formattedError.userMessage,
+            api: errorMessage,
           }));
         }
       }
@@ -131,7 +155,9 @@ export function CompanyInput({
   };
 
   const handleWebsiteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setWebsite(e.target.value);
+    const value = e.target.value;
+    console.log('[CompanyInput] Website input changed:', value);
+    setWebsite(value);
     // Clear error when user starts typing
     if (errors.website) {
       setErrors((prev) => ({...prev, website: undefined}));

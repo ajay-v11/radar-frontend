@@ -4,6 +4,7 @@ import {useState, useEffect} from 'react';
 import {useRouter} from 'next/navigation';
 import {ModelSelector} from '@/components/dashboard/ModelSelector';
 import {VisibilityReport} from '@/components/dashboard/VisibilityReport';
+import {StreamingDashboard} from '@/components/dashboard/StreamingDashboard';
 import {LoadingWizard} from '@/components/dashboard/LoadingWizard';
 import {ApiModeToggle} from '@/components/dev/ApiModeToggle';
 import {ErrorDisplay} from '@/components/dashboard/ErrorDisplay';
@@ -15,27 +16,43 @@ import type {
 } from '@/lib/api/types';
 import type {FormattedError} from '@/lib/api/errors';
 
-type DashboardStep = 'model-selection' | 'loading-report' | 'results' | 'error';
+type DashboardStep =
+  | 'model-selection'
+  | 'loading-report'
+  | 'streaming-results'
+  | 'results'
+  | 'error';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [step, setStep] = useState<DashboardStep>('model-selection');
+
+  // Check if we should skip model selection
+  const shouldSkipModelSelection =
+    typeof window !== 'undefined'
+      ? sessionStorage.getItem('skipModelSelection') === 'true'
+      : false;
+
+  const [step, setStep] = useState<DashboardStep>(
+    shouldSkipModelSelection ? 'streaming-results' : 'model-selection'
+  );
 
   // Initialize state from sessionStorage
-  const [companyData, setCompanyData] = useState<CompanyData | null>(() => {
+  const [companyData] = useState<CompanyData | null>(() => {
     if (typeof window === 'undefined') return null;
     const stored = sessionStorage.getItem('companyData');
     return stored ? JSON.parse(stored) : null;
   });
 
-  const [companyAnalysisData, setCompanyAnalysisData] =
-    useState<CompanyAnalysisData | null>(() => {
-      if (typeof window === 'undefined') return null;
-      const stored = sessionStorage.getItem('companyAnalysisData');
-      return stored ? JSON.parse(stored) : null;
-    });
+  const [companyAnalysisData] = useState<CompanyAnalysisData | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const stored = sessionStorage.getItem('companyAnalysisData');
+    return stored ? JSON.parse(stored) : null;
+  });
 
-  const [selectedModels, setSelectedModels] = useState<string[]>([]);
+  const [selectedModels, setSelectedModels] = useState<string[]>(() => {
+    // Default models for streaming dashboard
+    return shouldSkipModelSelection ? ['chatgpt', 'gemini'] : [];
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [sseEvents, setSseEvents] = useState<SSEEvent[]>([]);
   const [error, setError] = useState<FormattedError | null>(null);
@@ -49,6 +66,13 @@ export default function DashboardPage() {
     }
   }, [companyData, companyAnalysisData, router]);
 
+  // Clear the skip flag after initial load
+  useEffect(() => {
+    if (shouldSkipModelSelection && typeof window !== 'undefined') {
+      sessionStorage.removeItem('skipModelSelection');
+    }
+  }, [shouldSkipModelSelection]);
+
   const [visibilityData, setVisibilityData] =
     useState<VisibilityAnalysisData | null>(null);
 
@@ -61,7 +85,8 @@ export default function DashboardPage() {
     setVisibilityData(visibilityAnalysisData);
     setSseEvents([]); // Reset SSE events
     setError(null); // Clear any previous errors
-    setStep('loading-report');
+    // Go directly to streaming results with the data
+    setStep('streaming-results');
   };
 
   const handlePhase2Progress = (event: SSEEvent) => {
@@ -124,6 +149,18 @@ export default function DashboardPage() {
           endStep={2}
           sseEvents={sseEvents}
           phase={2}
+        />
+      )}
+
+      {step === 'streaming-results' && companyData && (
+        <StreamingDashboard
+          companyData={companyData}
+          selectedModels={selectedModels}
+          visibilityData={visibilityData}
+          sseEvents={sseEvents}
+          onBack={handleBackToModelSelection}
+          onProgress={handlePhase2Progress}
+          autoStart={shouldSkipModelSelection}
         />
       )}
 
