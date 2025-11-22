@@ -80,14 +80,43 @@ cd radar-frontend
 2. **Install dependencies**
 
 Using npm:
+
 ```bash
 npm install
 ```
 
 Or using pnpm:
+
 ```bash
 pnpm install
 ```
+
+3. **Configure environment variables**
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+Edit `.env.local` to configure your API settings:
+
+```bash
+# API Mode: 'mock' or 'real'
+NEXT_PUBLIC_API_MODE=mock
+
+# API Base URL (only used when API_MODE=real)
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+**Environment Variables:**
+
+- `NEXT_PUBLIC_API_MODE`: Controls which API implementation to use
+  - `mock` (default): Use simulated API responses for development without backend
+  - `real`: Connect to actual backend API server
+- `NEXT_PUBLIC_API_URL`: Base URL for the backend API (only used when `NEXT_PUBLIC_API_MODE=real`)
+  - Development: `http://localhost:8000`
+  - Production: Your production API URL
 
 ---
 
@@ -102,11 +131,34 @@ npm run dev
 ```
 
 Or with pnpm:
+
 ```bash
 pnpm dev
 ```
 
 The application will be available at [http://localhost:3000](http://localhost:3000)
+
+### API Modes
+
+The application supports two API modes:
+
+**Mock Mode (Default)**
+
+- Uses simulated API responses
+- No backend server required
+- Perfect for frontend development and testing
+- Realistic delays and data structures
+
+**Real Mode**
+
+- Connects to actual backend API
+- Requires backend server to be running
+- Use for integration testing and production
+
+To switch modes:
+
+1. Update `NEXT_PUBLIC_API_MODE` in your `.env.local` file
+2. In development, use the API mode toggle in the bottom-right corner of the dashboard
 
 ### Production Build
 
@@ -180,17 +232,20 @@ radar-frontend/
 ## 🎨 Key Features Implementation
 
 ### Animated Hero Section
+
 - Custom typing animation effect
 - Smooth RADAR text reveal with slide-in animation
 - Gradient highlight on key phrases
 - Animated background beams
 
 ### Responsive Design
+
 - Mobile-first approach
 - Optimized layouts for all screen sizes
 - Touch-friendly interactive elements
 
 ### Performance Optimizations
+
 - React Compiler enabled
 - Optimized font loading with `next/font`
 - Image optimization with Next.js Image component
