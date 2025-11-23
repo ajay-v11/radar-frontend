@@ -5,6 +5,7 @@ interface ExportButtonProps {
   title: string;
   description: string;
   color: 'red' | 'green' | 'blue';
+  onClick: () => void;
 }
 
 const colorClasses = {
@@ -45,9 +46,12 @@ export function ExportButton({
   title,
   description,
   color,
+  onClick,
 }: ExportButtonProps) {
   return (
-    <button className="group rounded-lg border border-border bg-background/50 p-4 text-left transition-all hover:border-primary/50 hover:bg-primary/5">
+    <button
+      onClick={onClick}
+      className="group rounded-lg border border-border bg-background/50 p-4 text-left transition-all hover:border-primary/50 hover:bg-primary/5">
       <div className="mb-3 flex items-center justify-between">
         <div
           className={`flex h-10 w-10 items-center justify-center rounded-lg ${colorClasses[color]}`}>

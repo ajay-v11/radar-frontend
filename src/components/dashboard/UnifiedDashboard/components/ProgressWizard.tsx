@@ -12,9 +12,9 @@ export function ProgressWizard({
   isAnalyzing,
 }: ProgressWizardProps) {
   return (
-    <div className="sticky top-4 rounded-lg border border-border bg-card/50 p-6 backdrop-blur-sm">
-      <h3 className="mb-6 text-sm font-semibold text-muted-foreground">
-        PROGRESS
+    <div className="rounded-lg border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
+      <h3 className="mb-6 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+        Progress
       </h3>
       <div className="relative space-y-6">
         {/* Connecting Line */}

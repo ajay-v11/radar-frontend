@@ -121,21 +121,28 @@ export function UnifiedDashboard({
       <div className="container mx-auto p-4 lg:p-8">
         <DashboardHeader onBack={onBack} />
 
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-          {/* Progress Wizard Sidebar */}
-          {wizardStep < 4 && (
-            <div className="lg:col-span-3">
-              <ProgressWizard
-                steps={WIZARD_STEPS}
-                currentStep={wizardStep}
-                isAnalyzing={isAnalyzing}
-              />
-            </div>
-          )}
-
-          {/* Main Content */}
+        <div className="mt-6 flex items-start gap-6">
+          {/* Progress Wizard Sidebar - Slide from Left (Sticky) */}
           <div
-            className={`space-y-6 ${wizardStep < 4 ? 'lg:col-span-9' : 'lg:col-span-12'}`}>
+            className={`flex-shrink-0 self-start overflow-hidden transition-all duration-500 ease-in-out ${
+              wizardStep < 4 ? 'w-[260px] opacity-100' : 'w-0 opacity-0'
+            }`}>
+            <div
+              className={`w-[260px] transform transition-transform duration-500 ease-in-out ${
+                wizardStep < 4 ? 'translate-x-0' : '-translate-x-full'
+              }`}>
+              <div className="sticky top-6">
+                <ProgressWizard
+                  steps={WIZARD_STEPS}
+                  currentStep={wizardStep}
+                  isAnalyzing={isAnalyzing}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Main Content (Scrollable) */}
+          <div className="flex-1 space-y-6 transition-all duration-500 ease-in-out">
             {/* Company Summary Card */}
             <CompanySummaryCard
               companyAnalysis={companyAnalysis}
@@ -174,6 +181,7 @@ export function UnifiedDashboard({
               <ExportReportCard
                 visibilityData={visibilityData}
                 selectedModels={selectedModels}
+                companyName={companyData.name}
               />
             )}
           </div>

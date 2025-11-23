@@ -5,7 +5,7 @@ interface ReportSummaryStatsProps {
   selectedModels: string[];
 }
 
-export default function ReportSummaryStats({
+export function ReportSummaryStats({
   visibilityData,
   selectedModels,
 }: ReportSummaryStatsProps) {
