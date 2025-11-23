@@ -2,7 +2,7 @@
 
 import {useState, useEffect} from 'react';
 import {useRouter} from 'next/navigation';
-import {UnifiedDashboard} from '@/components/dashboard/UnifiedDashboard';
+import {UnifiedDashboard} from '@/components/dashboard/UnifiedDashboard/UnifiedDashboard';
 import {ApiModeToggle} from '@/components/dev/ApiModeToggle';
 import {ErrorDisplay} from '@/components/dashboard/ErrorDisplay';
 import type {CompanyData} from '@/lib/types';
