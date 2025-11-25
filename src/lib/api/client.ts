@@ -116,6 +116,17 @@ export class APIClient {
     // Mock client doesn't support this yet
     throw new Error('Query log not available in mock mode');
   }
+
+  /**
+   * Export CSV report by slug ID
+   */
+  async exportCSV(slugId: string): Promise<Blob> {
+    if (this.mode === 'real') {
+      return this.realClient.exportCSV(slugId);
+    }
+    // Mock client doesn't support this yet
+    throw new Error('CSV export not available in mock mode');
+  }
 }
 
 // Singleton instance
