@@ -423,6 +423,39 @@ export class RealAPIClient {
     }
   }
 
+  async exportCSV(slugId: string): Promise<Blob> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(
+        `${this.baseURL}/report/${slugId}/export/csv`,
+        {
+          method: 'GET',
+          signal: controller.signal,
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await this.parseErrorResponse(response);
+        throw new Error(errorData.detail);
+      }
+
+      const blob = await response.blob();
+      return blob;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('CSV export request timed out');
+        }
+        throw error;
+      }
+      throw new Error('Unknown error exporting CSV');
+    }
+  }
+
   public cleanupAllConnections(): void {
     this.connectionManager.cleanupAll();
   }

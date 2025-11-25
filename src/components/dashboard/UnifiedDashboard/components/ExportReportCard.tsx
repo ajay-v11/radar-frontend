@@ -5,7 +5,7 @@ import {ExportButton} from './ExportButton';
 import {ReportSummaryStats} from './ReportSummaryStats';
 
 interface ExportReportCardProps {
-  visibilityData: any;
+  visibilityData: unknown;
   selectedModels: string[];
   companyName: string;
 }
@@ -16,13 +16,6 @@ export function ExportReportCard({
   companyName,
 }: ExportReportCardProps) {
   const normalizeScore = (score: number) => (score < 1 ? score * 100 : score);
-
-  const escapeCSV = (value: string) => {
-    if (value.includes(',') || value.includes('"') || value.includes('\n')) {
-      return `"${value.replace(/"/g, '""')}"`;
-    }
-    return value;
-  };
 
   const handleExportJSON = async () => {
     try {
@@ -63,115 +56,34 @@ export function ExportReportCard({
     }
   };
 
-  const handleExportCSV = () => {
-    const normalizedScore = normalizeScore(visibilityData.visibility_score);
-    const totalMentions =
-      visibilityData.total_mentions ||
-      visibilityData.analysis_report?.total_mentions ||
-      0;
+  const handleExportCSV = async () => {
+    try {
+      const visibilitySlugId = sessionStorage.getItem('visibilitySlugId');
+      if (!visibilitySlugId) {
+        alert('Report ID not found. Please complete the analysis first.');
+        return;
+      }
 
-    // Header rows
-    const rows = [
-      ['AI Visibility Report'],
-      ['Company', escapeCSV(companyName)],
-      ['Generated', new Date().toLocaleDateString()],
-      ['Overall Visibility Score', `${normalizedScore.toFixed(1)}%`],
-      ['Total Queries', visibilityData.total_queries?.toString() || '0'],
-      ['Total Mentions', totalMentions.toString()],
-      ['Models Tested', selectedModels.join('; ')],
-      [], // Empty row
-      ['Model Performance'],
-      ['Model', 'Visibility Score'],
-    ];
+      // Fetch CSV from API
+      const {getAPIClient} = await import('@/lib/api/client');
+      const apiClient = getAPIClient();
+      const csvBlob = await apiClient.exportCSV(visibilitySlugId);
 
-    // Model scores (new flat structure)
-    if (visibilityData.model_scores) {
-      Object.entries(visibilityData.model_scores).forEach(
-        ([model, score]: [string, any]) => {
-          const modelScore = normalizeScore(score || 0);
-          rows.push([escapeCSV(model), `${modelScore.toFixed(2)}%`]);
-        }
-      );
-    } else if (visibilityData.analysis_report?.by_model) {
-      // Fallback to old structure if available
-      Object.entries(visibilityData.analysis_report.by_model).forEach(
-        ([model, data]: [string, any]) => {
-          const mentionRate = normalizeScore(data.mention_rate || 0);
-          rows.push([escapeCSV(model), `${mentionRate.toFixed(2)}%`]);
-        }
-      );
+      // Download the CSV file
+      const url = URL.createObjectURL(csvBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${companyName.replace(/\s+/g, '-')}-visibility-report-${
+        new Date().toISOString().split('T')[0]
+      }.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting CSV:', error);
+      alert('Failed to export CSV. Please try again.');
     }
-
-    // Category breakdown (new structure)
-    if (
-      visibilityData.category_breakdown &&
-      visibilityData.category_breakdown.length > 0
-    ) {
-      rows.push([]); // Empty row
-      rows.push(['Category Breakdown']);
-      rows.push(['Category', 'Score', 'Queries', 'Mentions']);
-
-      visibilityData.category_breakdown.forEach((category: any) => {
-        rows.push([
-          escapeCSV(category.category || ''),
-          `${category.score?.toFixed(1) || 0}%`,
-          category.queries?.toString() || '0',
-          category.mentions?.toString() || '0',
-        ]);
-      });
-    }
-
-    // Batch results
-    if (
-      visibilityData.batch_results &&
-      visibilityData.batch_results.length > 0
-    ) {
-      rows.push([]); // Empty row
-      rows.push(['Batch Results']);
-      rows.push(['Batch #', 'Visibility Score', 'Total Mentions']);
-
-      visibilityData.batch_results.forEach((batch: any) => {
-        const batchScore = normalizeScore(batch.visibility_score || 0);
-        rows.push([
-          batch.batch_num?.toString() || '',
-          `${batchScore.toFixed(1)}%`,
-          batch.total_mentions?.toString() || '0',
-        ]);
-      });
-    }
-
-    // Sample mentions
-    if (
-      visibilityData.analysis_report?.sample_mentions &&
-      visibilityData.analysis_report.sample_mentions.length > 0
-    ) {
-      rows.push([]); // Empty row
-      rows.push(['Sample Query Results']);
-      rows.push(['Query', 'Result']);
-
-      visibilityData.analysis_report.sample_mentions.forEach(
-        (mention: string) => {
-          const parts = mention.split(' -> ');
-          const query =
-            parts[0]?.replace("Query: '", '').replace("'", '') || '';
-          const result = parts[1] || '';
-          rows.push([escapeCSV(query), escapeCSV(result)]);
-        }
-      );
-    }
-
-    const csvContent = rows.map((row) => row.join(',')).join('\n');
-    const blob = new Blob([csvContent], {type: 'text/csv;charset=utf-8;'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${companyName.replace(/\s+/g, '-')}-visibility-report-${
-      new Date().toISOString().split('T')[0]
-    }.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   };
 
   const handleExportPDF = () => {

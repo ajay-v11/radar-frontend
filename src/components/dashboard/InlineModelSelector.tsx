@@ -36,7 +36,7 @@ export function InlineModelSelector({
     setSelected((prev) => {
       if (prev.includes(modelId)) {
         return prev.filter((id) => id !== modelId);
-      } else if (prev.length < 2) {
+      } else if (prev.length < 4) {
         return [...prev, modelId];
       }
       return prev;
@@ -45,7 +45,7 @@ export function InlineModelSelector({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (selected.length === 2) {
+    if (selected.length >= 2 && selected.length <= 4) {
       onSubmit(selected, numQueries, llmProvider);
     }
   };
@@ -78,7 +78,7 @@ export function InlineModelSelector({
           Configure Visibility Test
         </CardTitle>
         <p className='text-sm text-muted-foreground'>
-          Select 2 AI models and number of queries to test
+          Select 2-4 AI models and number of queries to test
         </p>
       </CardHeader>
       <CardContent>
@@ -102,7 +102,7 @@ export function InlineModelSelector({
 
           <div className='space-y-2'>
             <Label htmlFor='llm-provider' className='text-sm font-medium'>
-              LLM Provider
+              LLM Provider-For query generation
             </Label>
             <select
               id='llm-provider'
@@ -120,12 +120,12 @@ export function InlineModelSelector({
 
           <div className='space-y-2'>
             <Label className='text-sm font-medium'>
-              Select AI Models (Choose 2)
+              Select AI Models (Choose 2-4) For testing
             </Label>
             <div className='grid grid-cols-2 gap-3'>
               {AI_MODELS.map((model) => {
                 const isChecked = selected.includes(model.id);
-                const isDisabled = !isChecked && selected.length >= 2;
+                const isDisabled = !isChecked && selected.length >= 4;
 
                 return (
                   <div
@@ -156,20 +156,20 @@ export function InlineModelSelector({
             </div>
           </div>
 
-          {selected.length !== 2 && (
+          {(selected.length < 2 || selected.length > 4) && (
             <p className='text-sm text-muted-foreground'>
               {selected.length === 0
-                ? 'Please select 2 AI models'
+                ? 'Please select 2-4 AI models'
                 : selected.length === 1
-                ? 'Please select 1 more AI model'
-                : 'Please select only 2 AI models'}
+                ? 'Please select at least 1 more AI model'
+                : 'Please select at most 4 AI models'}
             </p>
           )}
 
           <Button
             type='submit'
             size='lg'
-            disabled={selected.length !== 2}
+            disabled={selected.length < 2 || selected.length > 4}
             className='w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold'>
             Start Visibility Test
           </Button>
