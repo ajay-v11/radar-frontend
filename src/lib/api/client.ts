@@ -85,6 +85,37 @@ export class APIClient {
     }
     return this.mockClient.healthCheck();
   }
+
+  /**
+   * Get full report by slug ID
+   */
+  async getFullReport(slugId: string): Promise<unknown> {
+    if (this.mode === 'real') {
+      return this.realClient.getFullReport(slugId);
+    }
+    // Mock client doesn't support this yet
+    throw new Error('Full report not available in mock mode');
+  }
+
+  /**
+   * Get query log by slug ID with optional filters
+   */
+  async getQueryLog(
+    slugId: string,
+    params?: {
+      page?: number;
+      limit?: number;
+      category?: string;
+      model?: string;
+      mentioned?: boolean;
+    }
+  ): Promise<unknown> {
+    if (this.mode === 'real') {
+      return this.realClient.getQueryLog(slugId, params);
+    }
+    // Mock client doesn't support this yet
+    throw new Error('Query log not available in mock mode');
+  }
 }
 
 // Singleton instance

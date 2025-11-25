@@ -24,45 +24,43 @@ export function ExportReportCard({
     return value;
   };
 
-  const handleExportJSON = () => {
-    const normalizedScore = normalizeScore(visibilityData.visibility_score);
-    const totalMentions =
-      visibilityData.total_mentions ||
-      visibilityData.analysis_report?.total_mentions ||
-      0;
-    const totalQueries = visibilityData.total_queries || 0;
-    const mentionRate = totalQueries > 0 ? totalMentions / totalQueries : 0;
+  const handleExportJSON = async () => {
+    try {
+      const visibilitySlugId = sessionStorage.getItem('visibilitySlugId');
+      if (!visibilitySlugId) {
+        alert('Report ID not found. Please complete the analysis first.');
+        return;
+      }
 
-    const data = {
-      company: companyName,
-      models: selectedModels,
-      visibility_score: normalizedScore,
-      total_queries: totalQueries,
-      total_mentions: totalMentions,
-      mention_rate: mentionRate,
-      model_scores: visibilityData.model_scores || {},
-      category_breakdown: visibilityData.category_breakdown || [],
-      model_category_matrix: visibilityData.model_category_matrix || {},
-      analysis_report: visibilityData.analysis_report,
-      batch_results: visibilityData.batch_results,
-      sample_mentions: visibilityData.analysis_report?.sample_mentions || [],
-      timestamp: new Date().toISOString(),
-      generated_date: new Date().toLocaleDateString(),
-    };
+      // Fetch full report from API
+      const {getAPIClient} = await import('@/lib/api/client');
+      const apiClient = getAPIClient();
+      const fullReport = await apiClient.getFullReport(visibilitySlugId);
 
-    const blob = new Blob([JSON.stringify(data, null, 2)], {
-      type: 'application/json',
-    });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${companyName.replace(/\s+/g, '-')}-visibility-report-${
-      new Date().toISOString().split('T')[0]
-    }.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      // Add metadata
+      const data = {
+        ...(fullReport as Record<string, unknown>),
+        exported_at: new Date().toISOString(),
+        exported_date: new Date().toLocaleDateString(),
+      };
+
+      const blob = new Blob([JSON.stringify(data, null, 2)], {
+        type: 'application/json',
+      });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${companyName.replace(/\s+/g, '-')}-visibility-report-${
+        new Date().toISOString().split('T')[0]
+      }.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error exporting JSON:', error);
+      alert('Failed to export report. Please try again.');
+    }
   };
 
   const handleExportCSV = () => {
@@ -381,7 +379,7 @@ export function ExportReportCard({
                     visibilityData.analysis_report?.by_model ||
                     {}
                 )
-                  .map(([model, data]: [string, any]) => {
+                  .map(([model, data]: [string, unknown]) => {
                     const score =
                       typeof data === 'number' ? data : data.mention_rate || 0;
                     const modelScore = normalizeScore(score);
@@ -557,7 +555,7 @@ export function ExportReportCard({
           </div>
         </div>
 
-        <div className='grid gap-4 md:grid-cols-3'>
+        <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
           <ExportButton
             type='pdf'
             title='PDF Report'
@@ -579,6 +577,15 @@ export function ExportReportCard({
             color='blue'
             onClick={handleExportJSON}
           />
+          <a href='/query-log' className='block'>
+            <ExportButton
+              type='table'
+              title='Query Log'
+              description='View detailed query responses'
+              color='purple'
+              onClick={() => {}}
+            />
+          </a>
         </div>
 
         <ReportSummaryStats

@@ -338,6 +338,91 @@ export class RealAPIClient {
     }
   }
 
+  async getFullReport(slugId: string): Promise<unknown> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(`${this.baseURL}/report/${slugId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await this.parseErrorResponse(response);
+        throw new Error(errorData.detail);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Full report request timed out');
+        }
+        throw error;
+      }
+      throw new Error('Unknown error fetching full report');
+    }
+  }
+
+  async getQueryLog(
+    slugId: string,
+    params: {
+      page?: number;
+      limit?: number;
+      category?: string;
+      model?: string;
+      mentioned?: boolean;
+    } = {}
+  ): Promise<unknown> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+      const response = await fetch(
+        `${this.baseURL}/report/${slugId}/query-log`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            page: params.page || 1,
+            limit: params.limit || 50,
+            category: params.category,
+            model: params.model,
+            mentioned: params.mentioned,
+          }),
+          signal: controller.signal,
+        }
+      );
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await this.parseErrorResponse(response);
+        throw new Error(errorData.detail);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      if (error instanceof Error) {
+        if (error.name === 'AbortError') {
+          throw new Error('Query log request timed out');
+        }
+        throw error;
+      }
+      throw new Error('Unknown error fetching query log');
+    }
+  }
+
   public cleanupAllConnections(): void {
     this.connectionManager.cleanupAll();
   }

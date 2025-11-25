@@ -16,6 +16,14 @@ export interface VisibilityAnalysisRequest {
   query_weights?: Record<string, number>;
 }
 
+export interface QueryLogRequest {
+  page?: number;
+  limit?: number;
+  category?: string;
+  model?: string;
+  mentioned?: boolean;
+}
+
 // ============= Response Types =============
 
 export interface CompetitorData {
@@ -353,6 +361,58 @@ export type SSEEvent =
   | CategoryCompleteEvent
   | CompleteEvent
   | ErrorEvent;
+
+// ============= Report Types =============
+
+export interface FullReportSummary {
+  visibility_score: number;
+  total_queries: number;
+  total_mentions: number;
+  total_responses: number;
+  mention_rate: number;
+}
+
+export interface FullReportCompanyInfo {
+  name: string;
+  industry: string;
+  competitors: string[];
+}
+
+export interface FullReportData {
+  slug_id: string;
+  summary: FullReportSummary;
+  category_breakdown: CategoryBreakdownItem[];
+  competitor_rankings: CompetitorRanking[];
+  by_model: Record<string, ModelBreakdown>;
+  by_category: Record<string, unknown>;
+  sample_mentions: string[];
+  company_info: FullReportCompanyInfo;
+}
+
+export interface QueryLogResult {
+  query: string;
+  category: string;
+  results: Record<
+    string,
+    {
+      mentioned: boolean;
+      response: string;
+    }
+  >;
+}
+
+export interface QueryLogResponse {
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+  queries: QueryLogResult[];
+  filters: {
+    category?: string;
+    model?: string;
+    mentioned?: boolean;
+  };
+}
 
 // ============= Error Types =============
 
