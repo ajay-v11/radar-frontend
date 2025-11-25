@@ -3,9 +3,10 @@
 import {Card, CardContent} from '@/components/ui/card';
 import {ExportButton} from './ExportButton';
 import {ReportSummaryStats} from './ReportSummaryStats';
+import type {VisibilityAnalysisData} from '@/lib/api/types';
 
 interface ExportReportCardProps {
-  visibilityData: unknown;
+  visibilityData: VisibilityAnalysisData;
   selectedModels: string[];
   companyName: string;
 }
@@ -291,9 +292,9 @@ export function ExportReportCard({
                     visibilityData.analysis_report?.by_model ||
                     {}
                 )
-                  .map(([model, data]: [string, unknown]) => {
+                  .map(([model, data]) => {
                     const score =
-                      typeof data === 'number' ? data : data.mention_rate || 0;
+                      typeof data === 'number' ? data : (data as any)?.mention_rate || 0;
                     const modelScore = normalizeScore(score);
                     const status =
                       modelScore >= 70
@@ -334,7 +335,7 @@ export function ExportReportCard({
                 <tbody>
                   ${visibilityData.category_breakdown
                     .map(
-                      (category: unknown) => `
+                      (category) => `
                     <tr>
                       <td style="text-transform: capitalize; font-weight: 600;">${
                         category.category?.replace(/_/g, ' ') || ''
@@ -369,7 +370,7 @@ export function ExportReportCard({
                 </thead>
                 <tbody>
                   ${visibilityData.batch_results
-                    .map((batch: unknown) => {
+                    .map((batch) => {
                       const batchScore = normalizeScore(
                         batch.visibility_score || 0
                       );

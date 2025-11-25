@@ -14,6 +14,14 @@
 
 ---
 
+## 🎥 Demo Video
+
+Watch RADAR in action and see how it helps track your brand's AI visibility:
+
+**[📺 View Demo Video](https://drive.google.com/file/d/1Qrkt6YjbbT8foxMWcgv4qfr90PkLNDYf/view?usp=sharing)**
+
+---
+
 ## 📋 Table of Contents
 
 - [About](#about)
