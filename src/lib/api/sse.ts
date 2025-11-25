@@ -77,7 +77,24 @@ export class SSEConnection {
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        // Try to parse error details from response body
+        let errorDetail = response.statusText;
+        try {
+          const errorData = await response.json();
+          if (errorData.detail) {
+            // Handle FastAPI validation errors
+            if (Array.isArray(errorData.detail)) {
+              errorDetail = errorData.detail
+                .map((err: any) => `${err.loc?.join('.')}: ${err.msg}`)
+                .join(', ');
+            } else {
+              errorDetail = errorData.detail;
+            }
+          }
+        } catch {
+          // If parsing fails, use statusText
+        }
+        throw new Error(`HTTP ${response.status}: ${errorDetail}`);
       }
 
       if (!response.body) {

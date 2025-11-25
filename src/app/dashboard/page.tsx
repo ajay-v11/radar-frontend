@@ -37,6 +37,8 @@ export default function DashboardPage() {
     // Clear session storage and redirect to company input
     sessionStorage.removeItem('companyData');
     sessionStorage.removeItem('companyAnalysisData');
+    sessionStorage.removeItem('companySlugId');
+    sessionStorage.removeItem('visibilitySlugId');
     router.push('/company-input');
   };
 
@@ -53,7 +55,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className='min-h-screen bg-background'>
       {error ? (
         <ErrorDisplay
           error={error}

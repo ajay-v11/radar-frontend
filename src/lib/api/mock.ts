@@ -92,11 +92,37 @@ export class MockAPIClient {
 
     return {
       industry,
+      broad_category: 'Technology',
+      industry_description: `${industry} is a rapidly growing sector focused on innovation and digital transformation.`,
       company_name: companyName,
       company_description: `${companyName} is a leading company in the ${industry} sector, providing innovative solutions to businesses worldwide.`,
       company_summary: `${companyName} specializes in ${industry.toLowerCase()} with a focus on innovation and customer success.`,
       competitors,
       competitors_data: competitorsData,
+      target_region: request.target_region || 'United States',
+      product_category: industry,
+      market_keywords: ['innovation', 'technology', 'digital', 'solutions'],
+      target_audience: 'Business professionals and enterprises',
+      brand_positioning: {
+        value_proposition: 'Innovative solutions for modern businesses',
+        differentiators: [
+          'Cutting-edge technology',
+          'Customer-first approach',
+          'Scalable solutions',
+        ],
+        price_positioning: 'mid',
+      },
+      buyer_intent_signals: {
+        common_questions: [
+          'What are the pricing options?',
+          'How does it integrate?',
+          'What support is available?',
+        ],
+        decision_factors: ['Price', 'Features', 'Support', 'Scalability'],
+        pain_points: ['Complex setup', 'High costs', 'Limited integration'],
+      },
+      company_url: request.company_url,
+      slug_id: `company_${Math.random().toString(36).substring(2, 15)}`,
     };
   }
 
@@ -106,9 +132,7 @@ export class MockAPIClient {
   private generateMockVisibilityData(
     request: VisibilityAnalysisRequest
   ): VisibilityAnalysisData {
-    const companyName =
-      request.company_name ||
-      this.extractCompanyNameFromUrl(request.company_url);
+    const companyName = this.extractCompanyNameFromUrl(request.company_url);
     const numQueries = request.num_queries || 50;
     const models = request.models || ['gpt-4', 'claude-3', 'gemini-pro'];
     const batchSize = request.batch_size || 10;
@@ -306,11 +330,20 @@ export class MockAPIClient {
     data: CompanyAnalysisData,
     onProgress: (event: SSEEvent) => void
   ): Promise<void> {
+    // Initialize
+    onProgress({
+      step: 'initialize',
+      status: 'started',
+      message: `Starting analysis for ${data.company_url}`,
+    });
+
+    await this.delay(400);
+
     // Scraping started
     onProgress({
       step: 'scraping',
-      status: 'started',
-      message: 'Starting to scrape company website...',
+      status: 'in_progress',
+      message: 'Scraping website...',
     });
 
     await this.delay(600);
@@ -319,27 +352,52 @@ export class MockAPIClient {
     onProgress({
       step: 'scraping',
       status: 'completed',
-      message: 'Website scraping completed',
-      data: {content_length: 15000},
+      message: 'Website content retrieved',
+    });
+
+    await this.delay(400);
+
+    // Analyzing - classifying
+    onProgress({
+      step: 'analyzing',
+      status: 'in_progress',
+      message: 'Classifying industry...',
     });
 
     await this.delay(500);
 
-    // Analysis started
+    // Analyzing - extracting
     onProgress({
-      step: 'analysis',
-      status: 'started',
-      message: 'Analyzing company data...',
+      step: 'analyzing',
+      status: 'in_progress',
+      message: 'Extracting company data...',
     });
 
-    await this.delay(800);
+    await this.delay(600);
 
-    // Analysis completed
+    // Analyzing - generating categories
     onProgress({
-      step: 'analysis',
+      step: 'analyzing',
+      status: 'in_progress',
+      message: 'Generating query categories...',
+    });
+
+    await this.delay(500);
+
+    // Analyzing completed
+    onProgress({
+      step: 'analyzing',
       status: 'completed',
-      message: 'Company analysis completed',
-      data,
+      message: 'Company analysis complete',
+    });
+
+    await this.delay(300);
+
+    // Finalizing
+    onProgress({
+      step: 'finalizing',
+      status: 'completed',
+      message: 'Finalizing results...',
     });
 
     await this.delay(300);
@@ -348,7 +406,7 @@ export class MockAPIClient {
     onProgress({
       step: 'complete',
       status: 'success',
-      message: 'Company analysis complete',
+      message: 'Company analysis completed successfully',
       data,
     });
   }

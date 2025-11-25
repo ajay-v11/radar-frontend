@@ -247,3 +247,34 @@ body {
   animation: shimmer-horizontal 1.5s infinite;
   width: 50%;
 }
+
+@keyframes subtle-jiggle {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  25% {
+    transform: translateX(-2px) rotate(-0.5deg);
+  }
+  75% {
+    transform: translateX(2px) rotate(0.5deg);
+  }
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+.animate-subtle-jiggle {
+  animation: subtle-jiggle 0.5s ease-in-out 3;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}

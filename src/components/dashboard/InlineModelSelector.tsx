@@ -7,10 +7,11 @@ import {Label} from '@/components/ui/label';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 
 interface InlineModelSelectorProps {
-  onSubmit: (models: string[], numQueries: number) => void;
+  onSubmit: (models: string[], numQueries: number, llmProvider: string) => void;
   isCollapsed?: boolean;
   selectedModels?: string[];
   selectedQueries?: number;
+  selectedLlmProvider?: string;
 }
 
 const AI_MODELS = [
@@ -25,9 +26,11 @@ export function InlineModelSelector({
   isCollapsed = false,
   selectedModels: initialModels = [],
   selectedQueries: initialQueries = 20,
+  selectedLlmProvider: initialLlmProvider = 'claude',
 }: InlineModelSelectorProps) {
   const [selected, setSelected] = useState<string[]>(initialModels);
   const [numQueries, setNumQueries] = useState<number>(initialQueries);
+  const [llmProvider, setLlmProvider] = useState<string>(initialLlmProvider);
 
   const handleToggle = (modelId: string) => {
     setSelected((prev) => {
@@ -43,11 +46,14 @@ export function InlineModelSelector({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selected.length === 2) {
-      onSubmit(selected, numQueries);
+      onSubmit(selected, numQueries, llmProvider);
     }
   };
 
   if (isCollapsed) {
+    const providerDisplayName =
+      llmProvider.charAt(0).toUpperCase() + llmProvider.slice(1);
+
     return (
       <Card className='bg-muted/50 border-border'>
         <CardContent className='p-4'>
@@ -57,7 +63,7 @@ export function InlineModelSelector({
               {selected
                 .map((id) => AI_MODELS.find((m) => m.id === id)?.name)
                 .join(' & ')}{' '}
-              • {numQueries} queries
+              • {numQueries} queries • {providerDisplayName}
             </span>
           </div>
         </CardContent>
@@ -81,15 +87,35 @@ export function InlineModelSelector({
             <Label htmlFor='num-queries' className='text-sm font-medium'>
               Number of Queries
             </Label>
-            <input
+            <select
               id='num-queries'
-              type='number'
-              min='5'
-              max='50'
               value={numQueries}
               onChange={(e) => setNumQueries(parseInt(e.target.value) || 20)}
-              className='w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
-            />
+              className='w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer'>
+              {[20, 30, 40, 50, 60, 70, 80, 90, 100].map((num) => (
+                <option key={num} value={num}>
+                  {num} queries
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className='space-y-2'>
+            <Label htmlFor='llm-provider' className='text-sm font-medium'>
+              LLM Provider
+            </Label>
+            <select
+              id='llm-provider'
+              value={llmProvider}
+              onChange={(e) => setLlmProvider(e.target.value)}
+              className='w-full px-3 py-2 border border-border rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary cursor-pointer'>
+              <option value='claude'>Claude</option>
+              <option value='gemini'>Gemini</option>
+              <option value='llama'>Llama</option>
+              <option value='openai'>OpenAI</option>
+              <option value='grok'>Grok</option>
+              <option value='deepseek'>DeepSeek</option>
+            </select>
           </div>
 
           <div className='space-y-2'>

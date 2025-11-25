@@ -1,6 +1,7 @@
 export interface CompanyData {
   name: string;
   website: string;
+  targetRegion?: string;
 }
 
 export interface AIModel {
@@ -9,7 +10,7 @@ export interface AIModel {
   description: string;
 }
 
-export type QueryCategory = 
+export type QueryCategory =
   | 'Product Selection'
   | 'Comparison Queries'
   | 'How-To Queries'

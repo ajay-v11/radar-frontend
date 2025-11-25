@@ -5,7 +5,6 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {GlowingStarsBackground} from '@/components/ui/glowing-stars';
 import {getAPIClient} from '@/lib/api/client';
 import {formatErrorMessage, logError} from '@/lib/api/errors';
 import {getConnectionManager} from '@/lib/api/connection-manager';
@@ -15,6 +14,7 @@ import type {FormattedError} from '@/lib/api/errors';
 interface CompanyData {
   name: string;
   website: string;
+  targetRegion: string;
 }
 
 interface CompanyInputProps {
@@ -32,9 +32,11 @@ export function CompanyInput({
 }: CompanyInputProps) {
   const [companyName, setCompanyName] = React.useState('');
   const [website, setWebsite] = React.useState('');
+  const [targetRegion, setTargetRegion] = React.useState('');
   const [errors, setErrors] = React.useState<{
     name?: string;
     website?: string;
+    targetRegion?: string;
     api?: string;
   }>({});
 
@@ -49,7 +51,10 @@ export function CompanyInput({
     };
   }, []);
 
-  const isValid = companyName.trim() !== '' && website.trim() !== '';
+  const isValid =
+    companyName.trim() !== '' &&
+    website.trim() !== '' &&
+    targetRegion.trim() !== '';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +62,12 @@ export function CompanyInput({
     if (isLoading) return; // Prevent submission during loading
 
     // Validate fields
-    const newErrors: {name?: string; website?: string; api?: string} = {};
+    const newErrors: {
+      name?: string;
+      website?: string;
+      targetRegion?: string;
+      api?: string;
+    } = {};
 
     if (companyName.trim() === '') {
       newErrors.name = 'Company name is required';
@@ -65,6 +75,10 @@ export function CompanyInput({
 
     if (website.trim() === '') {
       newErrors.website = 'Website URL is required';
+    }
+
+    if (targetRegion.trim() === '') {
+      newErrors.targetRegion = 'Target region is required';
     }
 
     setErrors(newErrors);
@@ -81,6 +95,11 @@ export function CompanyInput({
         trimmedUrl
       );
 
+      // Clear any previous session data before starting new analysis
+      sessionStorage.removeItem('companyData');
+      sessionStorage.removeItem('companyAnalysisData');
+      sessionStorage.removeItem('skipModelSelection');
+
       try {
         const apiClient = getAPIClient();
 
@@ -89,17 +108,23 @@ export function CompanyInput({
           {
             company_url: trimmedUrl,
             company_name: trimmedName,
+            target_region: targetRegion.trim(),
           },
           onProgress
         );
 
         console.log('[CompanyInput] Analysis completed:', analysisData);
+        console.log(
+          '[CompanyInput] slug_id from response:',
+          analysisData.slug_id
+        );
 
         // Pass both company data and analysis data to parent
         onSubmit(
           {
             name: trimmedName,
             website: trimmedUrl,
+            targetRegion: targetRegion.trim(),
           },
           analysisData
         );
@@ -141,6 +166,7 @@ export function CompanyInput({
   const handleRetry = () => {
     // Clear API error and allow retry
     setErrors((prev) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const {api, ...rest} = prev;
       return rest;
     });
@@ -164,30 +190,36 @@ export function CompanyInput({
     }
   };
 
-  return (
-    <div className='relative min-h-screen flex items-center justify-center p-4 bg-background overflow-hidden'>
-      <GlowingStarsBackground />
+  const handleTargetRegionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setTargetRegion(e.target.value);
+    // Clear error when user starts typing
+    if (errors.targetRegion) {
+      setErrors((prev) => ({...prev, targetRegion: undefined}));
+    }
+  };
 
-      <div className='relative z-10'>
+  return (
+    <div className='relative flex items-center justify-center bg-background w-full h-full'>
+      <div className='relative z-10 w-full'>
         {/* <BackgroundGradient className="rounded-[22px] p-1 bg-card"> */}
-        <Card className='w-full max-w-md bg-card border-0'>
-          <CardHeader className='text-center space-y-2'>
-            <CardTitle className='text-2xl font-semibold text-foreground'>
-              Analyze Your Brand's AI Visibility
+        <Card className='w-full bg-card border-0'>
+          <CardHeader className='text-center space-y-3 pb-8'>
+            <CardTitle className='text-3xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent tracking-tight'>
+              Analyze Your Brand&apos;s AI Visibility
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className='space-y-4'>
+          <CardContent className='pb-8'>
+            <form onSubmit={handleSubmit} className='space-y-6'>
               <div className='space-y-2'>
                 <Label
                   htmlFor='company-name'
-                  className='text-sm text-muted-foreground'>
+                  className='text-base font-semibold text-foreground'>
                   Brand Name
                 </Label>
                 <Input
                   id='company-name'
                   type='text'
-                  placeholder=''
+                  placeholder='hello fresh'
                   value={companyName}
                   onChange={handleNameChange}
                   disabled={isLoading}
@@ -203,13 +235,13 @@ export function CompanyInput({
               <div className='space-y-2'>
                 <Label
                   htmlFor='website'
-                  className='text-sm text-muted-foreground'>
+                  className='text-base font-semibold text-foreground'>
                   Website URL
                 </Label>
                 <Input
                   id='website'
                   type='text'
-                  placeholder=''
+                  placeholder='https://www.hellofresh.com'
                   value={website}
                   onChange={handleWebsiteChange}
                   disabled={isLoading}
@@ -219,6 +251,30 @@ export function CompanyInput({
                 />
                 {errors.website && (
                   <p className='text-sm text-destructive'>{errors.website}</p>
+                )}
+              </div>
+
+              <div className='space-y-2'>
+                <Label
+                  htmlFor='target-region'
+                  className='text-base font-semibold text-foreground'>
+                  Target Region
+                </Label>
+                <Input
+                  id='target-region'
+                  type='text'
+                  placeholder='e.g., North America, Europe, Asia'
+                  value={targetRegion}
+                  onChange={handleTargetRegionChange}
+                  disabled={isLoading}
+                  className={`bg-background text-foreground ${
+                    errors.targetRegion ? 'border-destructive' : ''
+                  }`}
+                />
+                {errors.targetRegion && (
+                  <p className='text-sm text-destructive'>
+                    {errors.targetRegion}
+                  </p>
                 )}
               </div>
 
@@ -236,13 +292,15 @@ export function CompanyInput({
                 </div>
               )}
 
-              <Button
-                type='submit'
-                size='lg'
-                disabled={!isValid || isLoading}
-                className='w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50'>
-                {isLoading ? 'Analyzing...' : 'Run Scan'}
-              </Button>
+              <div className='pt-4'>
+                <Button
+                  type='submit'
+                  size='lg'
+                  disabled={!isValid || isLoading}
+                  className='w-full bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-base py-6 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 shadow-lg hover:shadow-xl transition-all duration-200'>
+                  {isLoading ? 'Analyzing...' : 'Run Scan'}
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
