@@ -2,6 +2,7 @@
 
 import {VisibilityScoreBento} from './VisibilityScoreBento';
 import {ModelPerformanceBento} from './ModelPerformanceBento';
+import {CompetitorRankingsCard} from './CompetitorRankingsCard';
 import {CategoryBreakdownCard} from './CategoryBreakdownCard';
 import {ModelCategoryMatrixCard} from './ModelCategoryMatrixCard';
 import {
@@ -101,10 +102,10 @@ export function VisibilityMetricsGrid({
 
   return (
     <div className='space-y-6'>
-      {/* Top Row: Visibility Score and Model Performance */}
-      <div className='grid gap-6 lg:grid-cols-5 animate-in fade-in duration-500'>
+      {/* Top Row: Visibility Score, Model Performance, and Competitors */}
+      <div className='grid gap-6 lg:grid-cols-12 animate-in fade-in duration-500'>
         {/* Visibility Score */}
-        <div className='lg:col-span-2'>
+        <div className='lg:col-span-3'>
           <VisibilityScoreBento
             visibilityScore={displayData.visibilityScore}
             totalMentions={displayData.totalMentions}
@@ -119,7 +120,7 @@ export function VisibilityMetricsGrid({
         {/* Model Performance */}
         {(displayData.modelData ||
           Object.keys(displayData.modelScores || {}).length > 0) && (
-          <div className='lg:col-span-3'>
+          <div className='lg:col-span-5'>
             <ModelPerformanceBento
               modelData={displayData.modelData}
               modelScores={displayData.modelScores}
@@ -130,6 +131,16 @@ export function VisibilityMetricsGrid({
             />
           </div>
         )}
+
+        {/* Top Competitors */}
+        {visibilityData?.top_competitors &&
+          visibilityData.top_competitors.length > 0 && (
+            <div className='lg:col-span-4'>
+              <CompetitorRankingsCard
+                competitors={visibilityData.top_competitors}
+              />
+            </div>
+          )}
       </div>
 
       {/* Category Breakdown - Always show when data is available */}

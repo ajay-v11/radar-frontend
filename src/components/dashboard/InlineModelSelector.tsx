@@ -17,7 +17,7 @@ interface InlineModelSelectorProps {
 const AI_MODELS = [
   {id: 'chatgpt', name: 'ChatGPT'},
   {id: 'claude', name: 'Claude'},
-  {id: 'perplexity', name: 'Perplexity'},
+  {id: 'llama', name: 'LLama'},
   {id: 'gemini', name: 'Gemini'},
 ];
 

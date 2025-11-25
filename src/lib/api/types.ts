@@ -115,6 +115,12 @@ export interface ModelCategoryMatrix {
   };
 }
 
+export interface CompetitorRanking {
+  name: string;
+  mention_count: number;
+  visibility_score: number;
+}
+
 export interface VisibilityAnalysisData {
   industry: string;
   company_name: string;
@@ -131,6 +137,7 @@ export interface VisibilityAnalysisData {
   categories_processed?: number;
   category_breakdown?: CategoryBreakdownItem[];
   model_category_matrix?: ModelCategoryMatrix;
+  top_competitors?: CompetitorRanking[];
 }
 
 // ============= SSE Event Types =============
