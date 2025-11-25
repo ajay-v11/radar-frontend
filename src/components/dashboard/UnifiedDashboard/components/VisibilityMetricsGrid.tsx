@@ -132,9 +132,8 @@ export function VisibilityMetricsGrid({
         )}
       </div>
 
-      {/* Category Breakdown - Show when streaming completes or data is available */}
-      {!isStreaming &&
-        displayData.categoryBreakdown &&
+      {/* Category Breakdown - Always show when data is available */}
+      {displayData.categoryBreakdown &&
         displayData.categoryBreakdown.length > 0 && (
           <div className='animate-in fade-in slide-in-from-bottom-4 duration-700'>
             <CategoryBreakdownCard

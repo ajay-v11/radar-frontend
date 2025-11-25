@@ -251,6 +251,16 @@ export function UnifiedDashboard({
       case 'complete':
         // Finalize data and stop streaming
         if (event.data && 'visibility_score' in event.data) {
+          console.log('[UnifiedDashboard] Complete event data:', event.data);
+          console.log(
+            '[UnifiedDashboard] Category breakdown:',
+            event.data.category_breakdown
+          );
+          console.log(
+            '[UnifiedDashboard] Model category matrix:',
+            event.data.model_category_matrix
+          );
+
           setVisibilityData(event.data as VisibilityAnalysisData);
           setIsStreaming(false);
           setIsAnalyzing(false);
@@ -395,7 +405,26 @@ export function UnifiedDashboard({
 
       // Handle cached responses (non-streaming)
       if (result) {
-        setVisibilityData(result);
+        console.log('[UnifiedDashboard] Cached result received:', result);
+
+        // Only set if we don't already have better data from streaming
+        // The streaming complete event has category_breakdown, cached result might not
+        setVisibilityData((prevData) => {
+          // If we already have data with category_breakdown, keep it
+          if (
+            prevData &&
+            prevData.category_breakdown &&
+            prevData.category_breakdown.length > 0
+          ) {
+            console.log(
+              '[UnifiedDashboard] Keeping streaming data, ignoring cached result'
+            );
+            return prevData;
+          }
+          // Otherwise use the cached result
+          return result;
+        });
+
         setIsStreaming(false);
         setIsAnalyzing(false);
 
