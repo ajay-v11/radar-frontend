@@ -255,6 +255,11 @@ export function UnifiedDashboard({
           setIsStreaming(false);
           setIsAnalyzing(false);
 
+          // Clear category progress after completion
+          setTimeout(() => {
+            setCategoryProgress([]);
+          }, 1000);
+
           // Store visibility slug_id if present
           if (event.data.slug_id) {
             sessionStorage.setItem('visibilitySlugId', event.data.slug_id);
@@ -393,6 +398,9 @@ export function UnifiedDashboard({
         setVisibilityData(result);
         setIsStreaming(false);
         setIsAnalyzing(false);
+
+        // Clear category progress for cached responses (no streaming occurred)
+        setCategoryProgress([]);
 
         // Store visibility slug ID on completion
         if (result.slug_id) {

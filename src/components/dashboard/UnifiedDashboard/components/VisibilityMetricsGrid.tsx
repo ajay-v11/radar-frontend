@@ -143,7 +143,7 @@ export function VisibilityMetricsGrid({
           </div>
         )}
 
-      {/* Model-Category Matrix - Show when streaming completes and matrix has data */}
+      {/* Model-Category Matrix - Only show if backend sends it with real data */}
       {!isStreaming &&
         visibilityData?.model_category_matrix &&
         Object.keys(visibilityData.model_category_matrix).length > 0 &&

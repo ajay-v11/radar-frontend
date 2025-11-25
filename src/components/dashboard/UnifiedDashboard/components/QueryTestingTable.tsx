@@ -80,6 +80,11 @@ export function QueryTestingTable({
   // Show category progress if available, otherwise show legacy batch results
   const showCategoryProgress = categoryProgress.length > 0;
 
+  // Hide the table if there's no data to show
+  if (!showCategoryProgress && batchResults.length === 0 && !isAnalyzing) {
+    return null;
+  }
+
   return (
     <Card className='overflow-hidden'>
       <CardHeader className='pb-3'>
